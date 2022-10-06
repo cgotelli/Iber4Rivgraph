@@ -1,10 +1,11 @@
 # Iber for Rivgraph
-Functions for preparing Iber output files to work with Rivgraph
+Functions for preparing Iber output files to work with Rivgraph. Tejedor et al. (2022)[^1]
 
+## Installing Rivgraph  
 
 You have two different ways to install rivgraph:
 
-- **With Anaconda[^1]:** We create a new environment that comes with rigraph included.  
+- **With Anaconda[^2]:** We create a new environment that comes with rigraph included.  
 `conda create -n Iber4Rivgrap rivgraph -c conda-forge`  
 
 - **With mamba:**
@@ -37,4 +38,5 @@ If you already have Anaconda, you can install **mamba* with the following code:
 ```
 conda install mamba -n base -c conda-forge
 ```
-[^1]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
+[^2]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
+[^1]: Tejedor, A., Schwenk, J., Kleinhans, M., Limaye, A. B., Vulis, L., Carling, P., et al. (2022). The entropic Braiding Index (eBI): A robust metric to account for the diversity of channel scales in multi-thread rivers. Geophysical Research Letters, 49, e2022GL099681. https://doi.org/10.1029/2022GL099681
