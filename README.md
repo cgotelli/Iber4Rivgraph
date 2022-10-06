@@ -4,28 +4,37 @@ Functions for preparing Iber output files to work with Rivgraph
 
 You have two different ways to install rivgraph:
 
-- **With Anaconda:** We create a new environment that comes with rigraph included.
+- **With Anaconda[^1]:** We create a new environment that comes with rigraph included.  
+`conda create -n Iber4Rivgrap rivgraph -c conda-forge`  
 
-`conda create -n Iber4Rivgrap rivgraph -c conda-forge`
-- **With Mambaforge:** We create a new environment first.
-
-`conda env create -n Iber4Rivgraph`
-
-Once it finishes, we activate this new environment.
-
-`conda activate Iber4Rivgraph`
-
-Then we use Mambaforge to install rivgraph from the conda-forge channel.
-
-`mamba install rivgraph -c conda-forge`
+- **With mamba:**
+  1. We create a new environment first.  
+  `conda env create -n Iber4Rivgraph`  
+  2. Once it finishes, we activate this new environment.  
+  `conda activate Iber4Rivgraph`  
+  3. Then we use Mambaforge to install rivgraph from the conda-forge channel.  
+  `mamba install rivgraph -c conda-forge`
 
 
 
-### **How to install Mambaforge?**
+### **What is mamba and how to install it?**
 
-In **Unix-like platforms**, open a terminal and enter:
+**mamba** is a CLI tool to manage conda s environments. If you already know **conda**, great, you already know **mamba!**
+
+If you’re new to this world, don’t panic you will find everything you need in [its documentation](https://mamba.readthedocs.io/en/latest/user_guide/mamba.html#mamba). We recommend to get familiar with [these concepts](https://mamba.readthedocs.io/en/latest/user_guide/concepts.html#concepts) first.
+
+There are different ways of installing **mamba**, rather when you have Anaconda already installed or not. 
+
+The recommended way is to do a *fresh install* without Anaconda. For that, in **Unix-like platforms**, open a terminal and enter:
 
 ```raw
 wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
 bash Mambaforge-$(uname)-$(uname -m).sh
 ```  
+For Windows, just download the installer from [here](https://github.com/conda-forge/miniforge#mambaforge) and execute it.
+
+If you already have Anaconda, you can install **mamba* with the following code:
+```
+conda install mamba -n base -c conda-forge
+```
+[^1]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
