@@ -1,6 +1,6 @@
 # Iber for Rivgraph
 
-Functions for preparing Iber output files to work with Rivgraph. Tejedor et al. (2022)[^1]
+Using Rivgraph to analyze Iber result *.asc files to work with Rivgraph. Tejedor et al. (2022)[^1]
 
 ## Installing Rivgraph  
 
