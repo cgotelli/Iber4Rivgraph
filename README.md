@@ -6,15 +6,23 @@ Functions for preparing Iber output files to work with Rivgraph. Tejedor et al. 
 You have two different ways to install rivgraph:
 
 - **With Anaconda[^2]:** We create a new environment that comes with rigraph included.  
-`conda create -n Iber4Rivgrap rivgraph -c conda-forge`  
+    ```
+    conda create -n Iber4Rivgrap rivgraph -c conda-forge
+    ```  
 
 - **With mamba:**
-  1. We create a new environment first.  
-  `conda env create -n Iber4Rivgraph`  
+  1. We create a new environment first.
+    ```
+    conda env create -n Iber4Rivgraph
+    ```  
   2. Once it finishes, we activate this new environment.  
-  `conda activate Iber4Rivgraph`  
+    ```
+    conda activate Iber4Rivgraph
+    ```  
   3. Then we use Mambaforge to install rivgraph from the conda-forge channel.  
-  `mamba install rivgraph -c conda-forge`
+    ```
+    mamba install rivgraph -c conda-forge
+    ```  
 
 
 
