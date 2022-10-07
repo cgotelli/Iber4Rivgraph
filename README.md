@@ -1,6 +1,6 @@
 # Iber for Rivgraph
 
-Using Rivgraph to analyze Iber result *.asc files to work with Rivgraph. [documentation](https://veinsoftheearth.github.io/RivGraph/) and
+Using Rivgraph to analyze Iber result _*.asc_ files to work with Rivgraph. [documentation](https://veinsoftheearth.github.io/RivGraph/) and
 [repository](https://github.com/VeinsOfTheEarth/RivGraph)
 
 Tejedor et al. (2022)[^1]
