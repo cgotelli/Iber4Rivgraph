@@ -8,8 +8,25 @@ Created on Thu Oct  6 13:08:14 2022
 
 import functions as f
 
+
 RastersPath = "/mnt/data1/GITHUB/Iber4Rivgraph/Rasters/"
 extension = ".asc"
 
-# We convert the water depth raster to 
+
+# Set the exit sides of the river relative to the image. In this case, the
+# Brahmaputra is "entering" the image from the North and "exiting" the 
+# image from the South.
+es = 'WE' # The first character is the upstream side
+
+maxSize = 5
+
+
+
+# We convert the water depth raster to binary masks. They are stored in a new "Masks" folder inside
+# the RastersPath folder.
 f.createMasks(RastersPath, extension)
+
+# We read the masks and process them:
+
+f.rg_preprocess(RastersPath, maxSize)
+f.getNetwork(RastersPath)
