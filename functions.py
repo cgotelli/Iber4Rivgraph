@@ -15,9 +15,9 @@ from os import listdir, mkdir
 from osgeo import gdal, osr
 
 
-def createMasks(rasterFolder, extension):
+def createMasks(rasterFolder, extension, depthThreshold, dischargeThreshold):
     """
-    
+
 
     Parameters
     ----------
@@ -38,14 +38,14 @@ def createMasks(rasterFolder, extension):
             print("Processing: " + file)
 
             rasterName = join(rasterFolder, file)
-            binarizeRaster(rasterName, rasterFolder, file)
+            binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThreshold)
 
     return None
 
 
-def binarizeRaster(rasterName, rasterFolder, file):
+def binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThreshold):
     """
-    
+
 
     Parameters
     ----------
@@ -61,22 +61,30 @@ def binarizeRaster(rasterName, rasterFolder, file):
     None.
 
     """
+    
+    # It opens the raster file as an array
     ds = gdal.Open(rasterName)
     band = ds.GetRasterBand(1)
     myarray = np.array(band.ReadAsArray())
+    
+    # Creates an array of the same size of the raster, on which all the NoData elements 
+    # (equal to -9999.0) are True and the rest are False.
     selection = np.logical_not(myarray == -9999.0)
 
+    # Creates a new array of the same size of the raster, with zeros only.
     new_array = [[0 for i in range(band.XSize)] for j in range(band.YSize)]
 
+    # On every element where we have a true in the boolean matrix, the new array will have a 1.
     for i, item in enumerate(myarray):
         for j, element in enumerate(item):
             if selection[i][j] == True:
                 new_array[i][j] = 1
             else:
                 new_array[i][j] = 0
+    
+    # It gets the geo transformation 
     geotransform = ds.GetGeoTransform()
-    # wkt = ds.GetProjection()
-
+    
     # Create gtif file
     driver = gdal.GetDriverByName("GTiff")
 
@@ -99,7 +107,7 @@ def binarizeRaster(rasterName, rasterFolder, file):
     dst_ds.SetGeoTransform(geotransform)
     # setting spatial reference of output raster
     srs = osr.SpatialReference()
-    
+
     srs.SetFromUserInput("EPSG:32719")
 
     dst_ds.SetProjection(srs.ExportToWkt())

@@ -20,7 +20,8 @@ es = 'WE' # The first character is the upstream side
 
 maxSize = 5
 
-
+depthThreshold = 0.01 # In meters 
+dischargeThreshold = 0.01 # In q^2/s
 
 # We convert the water depth raster to binary masks. They are stored in a new "Masks" folder inside
 # the RastersPath folder.
@@ -28,5 +29,5 @@ f.createMasks(RastersPath, extension)
 
 # We read the masks and process them:
 
-f.rg_preprocess(RastersPath, maxSize)
-f.getNetwork(RastersPath)
+# f.rg_preprocess(RastersPath, maxSize)
+# f.getNetwork(RastersPath)
