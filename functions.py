@@ -8,14 +8,17 @@ Created on Thu Oct  6 11:37:26 2022
 
 import numpy as np
 
-from os import listdir
-
-from os.path import isfile, join, exists
 from os import listdir, mkdir
+from os.path import join, exists
+
 from osgeo import gdal, osr
 
+import skimage
+from skimage import io
+from matplotlib import pyplot as plt
 
-def createMasks(rasterFolder, extension, depthThreshold, dischargeThreshold):
+
+def preprocess(rasterFolder, extension, dischargeThreshold):
     """
 
 
@@ -38,12 +41,12 @@ def createMasks(rasterFolder, extension, depthThreshold, dischargeThreshold):
             print("Processing: " + file)
 
             rasterName = join(rasterFolder, file)
-            binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThreshold)
+            binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold)
 
     return None
 
 
-def binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThreshold):
+def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold):
     """
 
 
@@ -69,7 +72,10 @@ def binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThre
     
     # Creates an array of the same size of the raster, on which all the NoData elements 
     # (equal to -9999.0) are True and the rest are False.
-    selection = np.logical_not(myarray == -9999.0)
+    selection_nodata = np.logical_not(myarray == -9999.0)
+    
+    selection_discharge = np.logical_not(myarray < dischargeThreshold)
+    
 
     # Creates a new array of the same size of the raster, with zeros only.
     new_array = [[0 for i in range(band.XSize)] for j in range(band.YSize)]
@@ -77,10 +83,19 @@ def binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThre
     # On every element where we have a true in the boolean matrix, the new array will have a 1.
     for i, item in enumerate(myarray):
         for j, element in enumerate(item):
-            if selection[i][j] == True:
+            if selection_nodata[i][j] == True:
                 new_array[i][j] = 1
             else:
                 new_array[i][j] = 0
+    
+    # On every element where we have a true in the boolean matrix, the new array will have a 1.
+    for i, item in enumerate(myarray):
+        for j, element in enumerate(item):
+            if selection_discharge[i][j] == True:
+                new_array[i][j] = 1
+            else:
+                new_array[i][j] = 0
+                
     
     # It gets the geo transformation 
     geotransform = ds.GetGeoTransform()
@@ -115,3 +130,15 @@ def binarizeRaster(rasterName, rasterFolder, file, depthThreshold, dischargeThre
 
     ds = None
     dst_ds = None
+
+
+def tidy(RastersPath, maxSize):
+    
+    return None
+
+
+
+
+def getNetwork(RastersPath):
+    
+    return None
