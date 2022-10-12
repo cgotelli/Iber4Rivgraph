@@ -55,6 +55,13 @@ conda install mamba -n base -c conda-forge
 
 The analysis with RivGraph of the To analyze the results of depth obtained with Iber it is necessary to follow the steps listed below:  
 1. The _*.asc_ file exported from Iber (Using the "Export results to Raster or XYZ" option).
+
+![alt text](/images/RasterExport_01.png)
+
+![alt text](/images/RasterExport_02.png)
+
+![alt text](/images/RasterExport_03.png)
+
 2. Use the `main.py` script to apply the following steps to the file:
     - Creates the mask from the depth map,
     - Tide up of the mask,
