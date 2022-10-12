@@ -57,7 +57,7 @@ The analysis with RivGraph of the To analyze the results of depth obtained with 
 1. The _*.asc_ file exported from Iber (Using the "Export results to Raster or XYZ" option).
 
 <p align="center">
-  <img src="/images/RasterExport_01.png" width="1050" title="hover text">
+  <img src="/images/RasterExport_01.png" width="500" title="hover text">
 </p>
 
 <p align="center">
