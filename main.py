@@ -24,9 +24,9 @@ dischargeThreshold = 0.005 # In q^2/s
 
 # We convert the water depth raster to binary masks. They are stored in a new "Masks" folder inside
 # the RastersPath folder.
-f.preprocess(RastersPath, extension, dischargeThreshold)
+f.preprocess(RastersPath, extension, dischargeThreshold, maxSize)
 
 # We read the masks and process them:
-f.tidy(RastersPath, maxSize)
-
 f.getNetwork(RastersPath)
+
+# f.getNetwork(RastersPath)
