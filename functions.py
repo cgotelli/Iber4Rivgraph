@@ -18,7 +18,7 @@ from skimage import io
 from matplotlib import pyplot as plt
 
 from rivgraph.classes import river
-
+import rivgraph.rivers.river_utils as ru
 
 def preprocess(rasterFolder, extension, dischargeThreshold, maxSize):
     """
@@ -36,16 +36,149 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize):
     None.
 
     """
+    print("----------------------")
+    print("Pre process started.\n")
+
     rasterFiles = sorted(listdir(rasterFolder))
     for file in rasterFiles:
         if file.endswith(extension):
 
-            print("Processing raster: " + file)
+            print("\t - Processing raster: " + file)
 
             rasterName = join(rasterFolder, file)
             binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize)
 
+    print("\nPre process finished.")
+    print("----------------------\n")
+
     return None
+
+
+def getNetwork(RastersPath):
+    """
+    This function is based on two different examples coming with RivGraph:
+        - braided_river_example.ipynb
+        - mouse_brain.ipynb
+
+
+    Parameters
+    ----------
+    RastersPath : TYPE
+        DESCRIPTION.
+    maxSize : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    rasterFolder = join(RastersPath, "Masks")
+    rasterFiles = sorted(listdir(rasterFolder))
+    resultsFolder = join(RastersPath, "Results")
+
+    es = "WE"
+
+    if not exists(resultsFolder):
+        mkdir(resultsFolder)
+
+    print("Getting Network from Masks\n")
+
+    for file in rasterFiles:
+        if file.endswith("_mask.tif"):
+            print("\t - Processing mask: " + file)
+            mask_path = join(rasterFolder, file)
+            name = file[:-9]
+
+            braidedRiver = river(name, mask_path, resultsFolder, exit_sides=es, verbose=True)
+
+            plt.figure(figsize=(20, 4))
+            plt.imshow(braidedRiver.Imask, interpolation="none", cmap="gray")
+            plt.title("Input tidy mask")
+            plt.axis("off")
+            plt.show()
+
+            # SKELETONIZE THE BINARY MASK
+            # Simply use the skeletonize() method.
+            braidedRiver.skeletonize()
+
+            # The skeletonized image is stored as an attribute to the brahm class. Let's take a look.
+            plt.figure(figsize=(20, 4))
+            plt.imshow(braidedRiver.Iskel)
+            plt.title("Skeleton")
+            plt.axis("off")
+            plt.show()
+
+            # COMPUTE THE NETWORK
+            # Simply use the compute_network() method.
+            braidedRiver.compute_network()
+
+            # Now we can see that the "links" and "nodes" dictionaries have been added
+            # as attributes to the brahma class:
+            links = braidedRiver.links
+            nodes = braidedRiver.nodes
+            print("links: {}".format(links.keys()))
+            print("nodes: {}".format(nodes.keys()))
+
+            braidedRiver.plot("network")
+
+            braidedRiver.to_geovectors("network", ftype="json")
+
+            # Let's see where the network geovector files were written:
+            print(braidedRiver.paths["links"])
+            print(braidedRiver.paths["nodes"])
+
+            # Prune the network
+            braidedRiver.prune_network()
+
+            braidedRiver.plot("network")
+            braidedRiver.to_geovectors("network", ftype="json")
+
+            # We see that 'inlets' and 'outlets' have been added to the nodes dictionary:
+            print(braidedRiver.nodes.keys())
+
+            # We can get the node ids of the inlets and outlets
+            print("inlets:", braidedRiver.nodes["inlets"])
+            print("outlets:", braidedRiver.nodes["outlets"])
+
+            # COMPUTE MORPHOLOGIC METRICS (LENGTHS, WIDTHS)
+            braidedRiver.compute_link_width_and_length()
+
+            print("Links keys")
+            print(braidedRiver.links.keys())
+
+            braidedRiver.to_geovectors("network", ftype="json")
+
+            # Let's look at histograms of link widths and lengths:
+            trash = plt.hist(braidedRiver.links["len_adj"], bins=50)
+            plt.ylabel("count")
+            plt.xlabel("link length (m)")
+            plt.title("Histogram of link lengths")
+            plt.show()
+
+            # print(braidedRiver.unit)
+
+            trash = plt.hist(braidedRiver.links["wid_adj"], bins=50)
+            plt.ylabel("count")
+            plt.xlabel("link width (m)")
+            plt.title("Histogram of link widths")
+
+            adj = braidedRiver.adjacency_matrix()
+            print(adj)
+
+            # COMPUTE MESH
+            # Note that we provide no arguments to the compute_mesh() function.
+            # braidedRiver.compute_mesh(grid_spacing=0.1, smoothing=0.2, buf_halfwidth=20)
+            
+            # Compute ebi and bi
+            # mesh_path = path to the "perps" file we made in the above code block
+            mesh_path = "/mnt/data1/GITHUB/Iber4Rivgraph/transects.geojson"
+            ebi, bi = ru.compute_eBI(mesh_path, braidedRiver.paths['links'], method='avg')
+            
+
+    print("Getting Network from Masks finished \n")
+
+    return links, nodes, ebi, bi
 
 
 def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize):
@@ -134,113 +267,9 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize):
     dst_ds = None
 
 
-def getNetwork(RastersPath):
-    """
-    This function is based on two different examples coming with RivGraph:
-        - braided_river_example.ipynb
-        - mouse_brain.ipynb
-
-
-    Parameters
-    ----------
-    RastersPath : TYPE
-        DESCRIPTION.
-    maxSize : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    """
-    rasterFolder = join(RastersPath, "Masks")
-    rasterFiles = sorted(listdir(rasterFolder))
-    resultsFolder = join(RastersPath, "Results")
-
-    es = "WE"
-
-    if not exists(resultsFolder):
-        mkdir(resultsFolder)
-
-    for file in rasterFiles:
-        if file.endswith("_mask.tif"):
-            print("Processing mask: " + file)
-            mask_path = join(rasterFolder, file)
-            name = file[:-9]
-
-            braidedRiver = river(name, mask_path, resultsFolder, exit_sides=es, verbose=True)
-
-            plt.imshow(braidedRiver.Imask, cmap="gray")
-            plt.show()
-
-            # SKELETONIZE THE BINARY MASK
-            # Simply use the skeletonize() method.
-            braidedRiver.skeletonize()
-
-            # The skeletonized image is stored as an attribute to the brahm class. Let's take a look.
-            plt.imshow(braidedRiver.Iskel)
-            plt.show()
-
-            # COMPUTE THE NETWORK
-            # Simply use the compute_network() method.
-            braidedRiver.compute_network()
-
-            # Now we can see that the "links" and "nodes" dictionaries have been added
-            # as attributes to the brahma class:
-            links = braidedRiver.links
-            nodes = braidedRiver.nodes
-            print("links: {}".format(links.keys()))
-            print("nodes: {}".format(nodes.keys()))
-
-            braidedRiver.plot("network")
-
-            braidedRiver.to_geovectors("network", ftype="json")
-
-            # Let's see where the network geovector files were written:
-            print(braidedRiver.paths["links"])
-            print(braidedRiver.paths["nodes"])
-
-            # Prune the network
-            braidedRiver.prune_network()
-
-            braidedRiver.plot('network')
-            # plt.imshow(braidedRiver.Iskel)
-            # plt.show()
-
-            # We see that 'inlets' and 'outlets' have been added to the nodes dictionary:
-            print(braidedRiver.nodes.keys())
-
-            # We can get the node ids of the inlets and outlets
-            print("inlets:", braidedRiver.nodes["inlets"])
-            print("outlets:", braidedRiver.nodes["outlets"])
-
-            # COMPUTE MORPHOLOGIC METRICS (LENGTHS, WIDTHS)
-            braidedRiver.compute_link_width_and_length()
-
-            # Let's look at histograms of link widths and lengths:
-            trash = plt.hist(braidedRiver.links["len_adj"], bins=50)
-            plt.ylabel("count")
-            plt.xlabel("link length (m)")
-            plt.title("Histogram of link lengths")
-            plt.show()
-
-            # print(braidedRiver.unit)
-
-            trash = plt.hist(braidedRiver.links["wid_adj"], bins=50)
-            plt.ylabel("count")
-            plt.xlabel("link width (m)")
-            plt.title("Histogram of link widths")
-
-            # COMPUTE MESH
-            # Note that we provide no arguments to the compute_mesh() function.
-            # braidedRiver.compute_mesh()
-
-    return None
-
-
 def tidy(Im, maxSize):
     """
-    
+
 
     Parameters
     ----------
@@ -258,10 +287,11 @@ def tidy(Im, maxSize):
 
     # Tidying up the mask
     from rivgraph import im_utils as iu
-    
+
     plt.figure(figsize=(20, 4))
     plt.imshow(Im, interpolation="none", cmap="gray")
     plt.title("Original image before tidy")
+    plt.axis("off")
     plt.show()
 
     # First, let's remove anything that isn't connected to the largest blob of the image
@@ -273,17 +303,18 @@ def tidy(Im, maxSize):
     plt.figure(figsize=(20, 4))
     plt.imshow(Ib, interpolation="none", cmap="gray")
     plt.title("Biggest blob in original image")
+    plt.axis("off")
     plt.show()
 
-    # Fill small holes in the mask.
-    Ihf = iu.fill_holes(
-        Ib, maxholesize=maxSize
-    )  # maxholesize is # of pixels the largest hole can be; anything smaller will be filled
+    # # Fill small holes in the mask.
+    # Ib = iu.fill_holes(
+    #     Ib, maxholesize=maxSize
+    # )  # maxholesize is # of pixels the largest hole can be; anything smaller will be filled
 
     plt.figure(figsize=(20, 4))
-    plt.imshow(Ihf, interpolation="none", cmap="gray")
+    plt.imshow(Ib, interpolation="none", cmap="gray")
     plt.title("Holes filled")
+    plt.axis("off")
     plt.show()
 
-
-    return Ihf
+    return Ib
