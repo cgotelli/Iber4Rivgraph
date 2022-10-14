@@ -51,24 +51,24 @@ We use RivGraph to analyze data coming from simulations done with Iber. Before r
 1. In the postprocess mode, press the button **Export results to Raster or XYZ**.
 
 <p align="center">
-  <img src="/images/RasterExport_01.png" width="500" title="Button to select.">
+  <img src="/Images/RasterExport_01.png" width="500" title="Button to select.">
 </p>
 
 2. Select **Specific Discharge (m2/s)**, the step and the cell size for the output Raster. 
 
 <p align="center">
-  <img src="/images/RasterExport_02.png" width="300" title="Exportation pop up.">
+  <img src="/Images/RasterExport_02.png" width="300" title="Exportation pop up.">
 </p>
 
 3. The Raster file will be created and saved inside the Iber's project folder. The total discharge (nor in x or y) is the file to be used with Rivgraph.
 <p align="center">
-  <img src="/images/RasterExport_03.png" width="800" title="Files saved in Project's folder.">
+  <img src="/Images/RasterExport_03.png" width="800" title="Files saved in Project's folder.">
 </p>
 
 It is also necessary to manually create the Mesh on which we will compute the different metrics (BI and eBI). For that task there are many different ways. We recommend to use the QGis. You just need to create a centerline, split it into different pieces of the size you wish (you can use the function **Split lines by maximum length** for that), and then create the transects by using the tool **Transect**. The result should look like this:
 
 <p align="center">
-  <img src="/images/Mesh.png" width="300" title="Mesh example.">
+  <img src="/Images/Mesh.png" width="900" title="Mesh example.">
 </p>
 
 ## Using the code  
