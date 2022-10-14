@@ -1,17 +1,20 @@
 # Iber for Rivgraph
 
-Using Rivgraph to analyze Iber result _*.asc_ files to work with Rivgraph. [documentation](https://veinsoftheearth.github.io/RivGraph/) and
-[repository](https://github.com/VeinsOfTheEarth/RivGraph)
+This is a code for using Rivgraph to analyze the results obtained with Iber. It looks forward to get the parameters explained in the work done by Tejedor et al. (2015a[^1], 2015b[^2], 2022[^3]). Below a there is an explanation on how to use the code and process the results.    
 
-Tejedor et al. (2022)[^1]
+[Iber](https://www.iberaula.es/1070/iber-model/about-the-model) is a two-dimensional numerical model for the simulation of free surface flow in rivers and estuaries. Iber solves the full depth-averaged shallow water equations in order to compute the water depth and the two horizontal components of the depth-averaged velocity.  
+
+[Rivgraph](https://github.com/VeinsOfTheEarth/RivGraph) is a Python package that provides tools for converting a binary mask of a channel network into a directed, weighted graph (i.e. a set of connected links and nodes). You can see some description of RivGraph's functionality via this [AGU poster](https://www.researchgate.net/publication/329845073_Automatic_Extraction_of_Channel_Network_Topology_RivGraph), and the flow directionality logic and validation is described in their [ESurf Dynamics paper](https://www.earth-surf-dynam.net/8/87/2020/esurf-8-87-2020.html). Check the [documentation](https://veinsoftheearth.github.io/RivGraph/) for further information.
 
 ## Installing Rivgraph  
 
 Rivgraph must be installed in a new environment to make it sure it will work. The simplest way of doing it is to create a new environment using the YML file available in this repository. This file contains not only Rivgraph but also other packages that are necessary for the postprocess of the data. to create this environment, you just have to enter in your console the following code:
 
-`conda env create -f Iber4Rivgraph.yml`
+```
+conda env create -f Iber4Rivgraph.yml
+```
 
-If you prefer to create a new environment from scratch, you can do it both in **mamba** or in **Anaconda[^2]**.
+If you prefer to create a new environment from scratch, you can do it both in **mamba** or in **Anaconda[^4]**.
 
 - **With Anaconda:** We create a new environment that comes with rigraph included.  
     ```
@@ -84,5 +87,8 @@ The code takes the Specific Discharge Raster file coming from Iber and makes the
     - Getting other parameters from the Network.
 
 
-[^2]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
+[^4]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
 [^1]: Tejedor, A., Schwenk, J., Kleinhans, M., Limaye, A. B., Vulis, L., Carling, P., et al. (2022). The entropic Braiding Index (eBI): A robust metric to account for the diversity of channel scales in multi-thread rivers. Geophysical Research Letters, 49, e2022GL099681. https://doi.org/10.1029/2022GL099681
+[^2]: Tejedor, A., A. Longjas, I. Zaliapin, and E. Foufoula-Georgiou (2015), Delta channel networks: 1. A graph-theoretic approach for studying connectivity and steady state transport on deltaic surfaces, Water Resour. Res., 51, 3998–4018, https://doi.org/10.1002/2014WR016577.
+[^3]: Tejedor, A., A. Longjas, I. Zaliapin, and E. Foufoula-Georgiou (2015), Delta channel networks: 2. Metrics of topologic and dynamic complexity for
+delta comparison, physical inference, and vulnerability assessment, Water Resour. Res., 51, 4019–4045, https://doi.org/10.1002/2014WR016604.
