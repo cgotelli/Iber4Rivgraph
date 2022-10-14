@@ -20,6 +20,7 @@ from matplotlib import pyplot as plt
 from rivgraph.classes import river
 import rivgraph.rivers.river_utils as ru
 
+
 def preprocess(rasterFolder, extension, dischargeThreshold, maxSize):
     """
 
@@ -54,7 +55,7 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize):
     return None
 
 
-def getNetwork(RastersPath):
+def getNetwork(RastersPath, mesh_path):
     """
     This function is based on two different examples coming with RivGraph:
         - braided_river_example.ipynb
@@ -169,12 +170,11 @@ def getNetwork(RastersPath):
             # COMPUTE MESH
             # Note that we provide no arguments to the compute_mesh() function.
             # braidedRiver.compute_mesh(grid_spacing=0.1, smoothing=0.2, buf_halfwidth=20)
-            
+
             # Compute ebi and bi
             # mesh_path = path to the "perps" file we made in the above code block
-            mesh_path = "/mnt/data1/GITHUB/Iber4Rivgraph/transects.geojson"
-            ebi, bi = ru.compute_eBI(mesh_path, braidedRiver.paths['links'], method='avg')
-            
+
+            ebi, bi = ru.compute_eBI(mesh_path, braidedRiver.paths["links"], method="avg")
 
     print("Getting Network from Masks finished \n")
 
