@@ -23,7 +23,9 @@ from scipy.io import savemat
 # import rivgraph.deltas.delta_metrics as dm
 
 # import networkx as nx
-plt.style.use('ggplot')
+
+# Set style for plots
+plt.style.use('seaborn-v0_8-pastel')
 
 def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
     """

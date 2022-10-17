@@ -21,11 +21,11 @@ mesh_path = "/mnt/data1/GITHUB/Iber4Rivgraph/Mesh/mesh.geojson"
 # image from the East.
 es = "WE"  # The first character is the upstream side
 
-maxSize = 5
+maxSize = 5 # In pixels
 
 dischargeThreshold = 0.01  # In q^2/s
 
-plots = True
+plots = True # To plot or not the figures.
 
 
 # ---- DO NOT MODIFY FROM THIS POINT DOWN ---
@@ -37,3 +37,6 @@ f.preprocess(RastersPath, extension, dischargeThreshold, maxSize, plots)
 
 # We read the masks and process them:
 links, nodes, ebi, bi, am = f.getNetwork(RastersPath, mesh_path, es, plots)
+
+
+# TODO: Include the computation of all other parameters explained in Tejedor et al. (2015a, 2015b).
