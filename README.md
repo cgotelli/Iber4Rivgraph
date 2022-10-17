@@ -49,7 +49,7 @@ conda install mamba -n base -c conda-forge
 
 ## Preparing the data from Iber
 
-We use RivGraph to analyze data coming from simulations done with Iber. Before running Rivgraph is necessary to export the specific discharge data from Iber as ASC file. To do it just follow the steps listed below: 
+Before running Rivgraph is necessary to export the **specific discharge** data from Iber as ASC file. To do it just follow the steps listed below: 
 
 1. In the postprocess mode, press the button **Export results to Raster or XYZ**.
 
@@ -74,21 +74,59 @@ It is also necessary to manually create the Mesh on which we will compute the di
   <img src="/Images/Mesh.png" width="900" title="Mesh example.">
 </p>
 
-## Using the code  
+## The code  
 
-The code takes the Specific Discharge Raster file coming from Iber and makes the necessary conversions to make it work with Rivgraph.
+For running the code it is necessary to execute the file `main.py` with Spyder or any other IDE. This code reads Specific Discharge Raster, creates the mask and process it with Rivgraph to obtain different Morphologic metrics.
 
-2. Use the `main.py` script to apply the following steps to the file:
-    - Creates the mask from the depth map,
-    - Tide up of the mask,
-    - Computing a graphical representation of the mask,
-    - Pruning the network,
-    - Getting the BI and eBI values, the graph as a NetworkX object,
-    - Getting other parameters from the Network.
+The structure of the folders and their contents are shown and explained below in a file tree.
+
+```raw
+├── main.py
+├── functions.py
+├── Mesh
+│   └── mesh.geojson
+└── Rasters
+    ├── Masks*
+    └── Results*
+```
+> ***** These folders are automatically created by the code.  
+
+- `main.py` is the file that calls all the functions and has the necessary parameters to go from Iber to the final output with the Morphologic metrics.
+- `functions.py` is the script containing all the functions that are used. Some specific parameters that were set for the braided river flume at LHE must be modified inside.
+- *Mesh* is the folder where the "handmade" mesh is stored. This file must be saved from QGis as a GeoJson file.
+- *Rasters* is the folder in which all the rasters file to be processed are stored.
+- Both *Masks* and *Results* folders are created by the code to store the results for each processed raster file.
+
+### Code's workflow
+
+So far the code does the following:
+
+1. Creates the mask from the depth map,
+2. Tidy-up of the mask,
+3. Computing a graphical representation of the mask,
+4. Prunes the network,
+5. Gets the nodes, links, and BI and eBI values,
+6. Exports these values for later use.
 
 
-[^4]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
+### Using the code
+
+The code needs some inputs to work. These parameters are:  
+
+- **rastersPath: Path to the folder containing the raster files.**
+- **extension:** Extension of the raster files. Normally should be _*.asc_.
+- **meshPath:** Path to the folder where the mesh geojson file is saved.
+- **direction:** Input-to-Output movement direction in cardinal terms (e.g., "WE": West to East).
+- **dischargeThreshold:** Threshold value for discharge to be considered important to be a part of the network. This value is hand picked based on calibration/comparison of images with simulation outputs.   
+- **showPlots:** Boolean to indicate if plots are to be shown or not. Recommended to check process the first times. 
+
+Once these parameters are correctly entered, it is just necessary to run the code. The folders with masks and results should appear automatically.
+
+> :warning: **DO NOT FORGET TO ACTIVATE THE ENVIRONMENT BEFORE RUNNING THE CODE!**
+
+
 [^1]: Tejedor, A., Schwenk, J., Kleinhans, M., Limaye, A. B., Vulis, L., Carling, P., et al. (2022). The entropic Braiding Index (eBI): A robust metric to account for the diversity of channel scales in multi-thread rivers. Geophysical Research Letters, 49, e2022GL099681. https://doi.org/10.1029/2022GL099681
 [^2]: Tejedor, A., A. Longjas, I. Zaliapin, and E. Foufoula-Georgiou (2015), Delta channel networks: 1. A graph-theoretic approach for studying connectivity and steady state transport on deltaic surfaces, Water Resour. Res., 51, 3998–4018, https://doi.org/10.1002/2014WR016577.
 [^3]: Tejedor, A., A. Longjas, I. Zaliapin, and E. Foufoula-Georgiou (2015), Delta channel networks: 2. Metrics of topologic and dynamic complexity for
 delta comparison, physical inference, and vulnerability assessment, Water Resour. Res., 51, 4019–4045, https://doi.org/10.1002/2014WR016604.
+[^4]: Sometimes Anaconda has problems to install Rivgraph (it keeps looking forever for the package). For that case, it is better to use **mamba**.
