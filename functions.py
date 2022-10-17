@@ -13,17 +13,21 @@ from os.path import join, exists
 
 from osgeo import gdal, osr
 
-import skimage
-from skimage import io
 from matplotlib import pyplot as plt
 
 from rivgraph.classes import river
 import rivgraph.rivers.river_utils as ru
 
+from scipy.io import savemat
+
+# import rivgraph.deltas.delta_metrics as dm
+
+# import networkx as nx
+plt.style.use('ggplot')
 
 def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
     """
-    
+
 
     Parameters
     ----------
@@ -41,7 +45,7 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
     None.
 
     """
-    
+
     print("----------------------")
     print("Pre process started.\n")
 
@@ -50,8 +54,8 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
         if file.endswith(extension):
 
             print("\t - Processing raster: " + file)
-
             rasterName = join(rasterFolder, file)
+            # Transforms the Raster into a Binary Mask
             binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, plots)
 
     print("\nPre process finished.")
@@ -60,9 +64,9 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
     return None
 
 
-def getNetwork(RastersPath, mesh_path,es,plots):
+def getNetwork(RastersPath, mesh_path, es, plots):
     """
-    
+
 
     Parameters
     ----------
@@ -90,20 +94,23 @@ def getNetwork(RastersPath, mesh_path,es,plots):
     rasterFiles = sorted(listdir(rasterFolder))
     resultsFolder = join(RastersPath, "Results")
 
-    
-
+    # Creates output folder if it does not exist
     if not exists(resultsFolder):
         mkdir(resultsFolder)
 
     print("Getting Network from Masks\n")
 
+    # Process each file inside folder that was stored as mask. Recognizable for its name.
     for file in rasterFiles:
         if file.endswith("_mask.tif"):
             print("\t - Processing mask: " + file)
             mask_path = join(rasterFolder, file)
             name = file[:-9]
 
+            # Creates river class object.
             braidedRiver = river(name, mask_path, resultsFolder, exit_sides=es, verbose=plots)
+
+            # Plots the mask.
             if plots:
                 plt.figure(figsize=(20, 4))
                 plt.imshow(braidedRiver.Imask, interpolation="none", cmap="gray")
@@ -114,30 +121,35 @@ def getNetwork(RastersPath, mesh_path,es,plots):
             # SKELETONIZE THE BINARY MASK
             # Simply use the skeletonize() method.
             braidedRiver.skeletonize()
-            
+
+            # Plots the skeletonized image.
             if plots:
-                # The skeletonized image is stored as an attribute to the brahm class. Let's take a look.
+                # The skeletonized image is stored as an attribute to the river class.
                 plt.figure(figsize=(20, 4))
                 plt.imshow(braidedRiver.Iskel)
                 plt.title("Skeleton")
                 plt.axis("off")
                 plt.show()
 
-            # COMPUTE THE NETWORK
+            # COMPUTE THE NETWORK FROM SKELETONIZED MASK
             # Simply use the compute_network() method.
             braidedRiver.compute_network()
 
             # Now we can see that the "links" and "nodes" dictionaries have been added
-            # as attributes to the brahma class:
+            # as attributes to the river class:
             links = braidedRiver.links
             nodes = braidedRiver.nodes
+
+            # Exports the results to JSON files
+            braidedRiver.to_geovectors("network", ftype="json")
+
+            # Prints the information of links and nodes
             if plots:
                 print("links: {}".format(links.keys()))
                 print("nodes: {}".format(nodes.keys()))
 
-            braidedRiver.plot("network")
-
-            braidedRiver.to_geovectors("network", ftype="json")
+                # Plots the river network.
+                braidedRiver.plot("network")
 
             if plots:
                 # Let's see where the network geovector files were written:
@@ -147,63 +159,82 @@ def getNetwork(RastersPath, mesh_path,es,plots):
             # Prune the network
             braidedRiver.prune_network()
 
-            braidedRiver.plot("network")
-            braidedRiver.to_geovectors("network", ftype="json")
-            
+            if plots:
+                braidedRiver.plot("network")
+
+
             if plots:
                 # We see that 'inlets' and 'outlets' have been added to the nodes dictionary:
                 print(braidedRiver.nodes.keys())
-    
+
                 # We can get the node ids of the inlets and outlets
                 print("inlets:", braidedRiver.nodes["inlets"])
                 print("outlets:", braidedRiver.nodes["outlets"])
 
             # COMPUTE MORPHOLOGIC METRICS (LENGTHS, WIDTHS)
             braidedRiver.compute_link_width_and_length()
-            
+
             if plots:
                 print("Links keys")
                 print(braidedRiver.links.keys())
 
             braidedRiver.to_geovectors("network", ftype="json")
-            
+
             if plots:
                 # Let's look at histograms of link widths and lengths:
-                trash = plt.hist(braidedRiver.links["len_adj"], bins=50)
+                plt.hist(braidedRiver.links["len_adj"], bins=20)
                 plt.ylabel("count")
                 plt.xlabel("link length (m)")
                 plt.title("Histogram of link lengths")
                 plt.show()
 
             # print(braidedRiver.unit)
-
-            trash = plt.hist(braidedRiver.links["wid_adj"], bins=50)
-           
-            if plots:            
+            if plots:
+                plt.hist(braidedRiver.links["wid_adj"], bins=20)
                 plt.ylabel("count")
                 plt.xlabel("link width (m)")
                 plt.title("Histogram of link widths")
+                plt.show()
 
-            adj = braidedRiver.adjacency_matrix()
-            
-
-            # COMPUTE MESH
-            # Note that we provide no arguments to the compute_mesh() function.
-            # braidedRiver.compute_mesh(grid_spacing=0.1, smoothing=0.2, buf_halfwidth=20)
-
-            # Compute ebi and bi
-            # mesh_path = path to the "perps" file we made in the above code block
-
+            # Loads mesh file created with QGis
             ebi, bi = ru.compute_eBI(mesh_path, braidedRiver.paths["links"], method="avg")
+
+            # As the mesh was made with QGis and the transect tool, it doesn't have the same format
+            # as expected by RivGraph (For each transect it has to lines that make that transect,
+            # one from the centerline to each side). The way to fix it is to take only one value per
+            # line.
+            bi = bi[::2]
+            ebi = ebi[::2]
+            
+            # Gets the adjacency matrix
+            am = braidedRiver.adjacency_matrix()
+            
+            # Plots both BI and eBI.
+            if plots:
+                plt.plot(bi, label="BI")
+                plt.plot(ebi, label="eBI")
+                plt.legend()
+                plt.ylabel("Value")
+                plt.xlabel("Transect [m]")
+                plt.show()
+
+            # Export output as Matfile
+            savemat(
+                join(resultsFolder, str(file[:-8] + "_output.mat")),
+                {"eBI": ebi, "BI": bi, "links": links, "nodes": nodes, "Adjmat": am},
+            )
+            
+            # TODO: Incluir la opción 
+            # braidedRiver.assign_flow_directions()
 
     print("Getting Network from Masks finished \n")
 
-    return links, nodes, ebi, bi
+    return links, nodes, ebi, bi, am
 
 
 def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, plots):
     """
-    
+
 
     Parameters
     ----------
@@ -233,6 +264,7 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
     # (equal to -9999.0) are True and the rest are False.
     selection_nodata = np.logical_not(myarray == -9999.0)
 
+    # Same with all elements whose value is below the threshold.
     selection_discharge = np.logical_not(myarray < dischargeThreshold)
 
     # Creates a new array of the same size of the raster, with zeros only.
@@ -246,7 +278,7 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
             else:
                 new_array[i][j] = 0
 
-    # On every element where we have a true in the boolean matrix, the new array will have a 1.
+    # On every element where we have a true in the boolean matrices, the new array will have a 1.
     for i, item in enumerate(myarray):
         for j, element in enumerate(item):
             if selection_discharge[i][j] == True:
@@ -264,12 +296,15 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
     if not exists(masks_folder):
         mkdir(masks_folder)
 
+    # New output file's name
     output_file = join(masks_folder, file[:-4] + "_mask.tif")
 
     dst_ds = driver.Create(output_file, band.XSize, band.YSize, 1, gdal.GDT_Int16)
 
+    # Transforms into array
     new_array = np.array(new_array)
 
+    # Tidy up the array removing noise
     new_array = tidy(new_array, maxSize, plots)
 
     # writting output raster
@@ -282,16 +317,17 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
     # setting spatial reference of output raster
     srs = osr.SpatialReference()
 
+    # Sets a metric CRS
     srs.SetFromUserInput("EPSG:32719")
 
     dst_ds.SetProjection(srs.ExportToWkt())
-    # Close output raster dataset
 
+    # Close output raster dataset
     ds = None
     dst_ds = None
 
 
-def tidy(Im, maxSize,plots):
+def tidy(Im, maxSize, plots):
     """
 
 
@@ -311,6 +347,7 @@ def tidy(Im, maxSize,plots):
 
     # Tidying up the mask
     from rivgraph import im_utils as iu
+
     if plots:
         plt.figure(figsize=(20, 4))
         plt.imshow(Im, interpolation="none", cmap="gray")
@@ -322,23 +359,12 @@ def tidy(Im, maxSize,plots):
     Ib = iu.largest_blobs(
         Im, action="keep"
     )  # action can also be 'remove' if we want to delete it instead
-    
+
     if plots:
         # Now take a look
         plt.figure(figsize=(20, 4))
         plt.imshow(Ib, interpolation="none", cmap="gray")
         plt.title("Biggest blob in original image")
-        plt.axis("off")
-        plt.show()
-
-    # # Fill small holes in the mask.
-    # Ib = iu.fill_holes(
-    #     Ib, maxholesize=maxSize
-    # )  # maxholesize is # of pixels the largest hole can be; anything smaller will be filled
-
-        plt.figure(figsize=(20, 4))
-        plt.imshow(Ib, interpolation="none", cmap="gray")
-        plt.title("Holes filled")
         plt.axis("off")
         plt.show()
 

@@ -8,7 +8,6 @@ Created on Thu Oct  6 13:08:14 2022
 
 
 import functions as f
-from rivgraph.deltas import delta_metrics as dm
 
 # -------------- Files' paths ---------------
 RastersPath = "/mnt/data1/GITHUB/Iber4Rivgraph/Rasters/"
@@ -27,6 +26,8 @@ maxSize = 5
 dischargeThreshold = 0.01  # In q^2/s
 
 plots = True
+
+
 # ---- DO NOT MODIFY FROM THIS POINT DOWN ---
 # -------------- Files' paths ---------------
 
@@ -35,4 +36,4 @@ plots = True
 f.preprocess(RastersPath, extension, dischargeThreshold, maxSize, plots)
 
 # We read the masks and process them:
-links, nodes, ebi, bi = f.getNetwork(RastersPath, mesh_path, es,plots)
+links, nodes, ebi, bi, am = f.getNetwork(RastersPath, mesh_path, es, plots)
