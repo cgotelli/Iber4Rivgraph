@@ -27,7 +27,7 @@ from scipy.io import savemat
 # Set style for plots
 plt.style.use('seaborn-v0_8-pastel')
 
-def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
+def preprocess(rasterFolder, extension, dischargeThreshold, plots):
     """
 
 
@@ -58,7 +58,7 @@ def preprocess(rasterFolder, extension, dischargeThreshold, maxSize, plots):
             print("\t - Processing raster: " + file)
             rasterName = join(rasterFolder, file)
             # Transforms the Raster into a Binary Mask
-            binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, plots)
+            binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, plots)
 
     print("\nPre process finished.")
     print("----------------------\n")
@@ -234,7 +234,7 @@ def getNetwork(RastersPath, mesh_path, es, plots):
     return links, nodes, ebi, bi, am
 
 
-def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, plots):
+def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, plots):
     """
 
 
@@ -248,7 +248,7 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
         DESCRIPTION.
     dischargeThreshold : TYPE
         DESCRIPTION.
-    maxSize : TYPE
+
         DESCRIPTION.
 
     Returns
@@ -307,7 +307,7 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
     new_array = np.array(new_array)
 
     # Tidy up the array removing noise
-    new_array = tidy(new_array, maxSize, plots)
+    new_array = tidy(new_array, plots)
 
     # writting output raster
     dst_ds.GetRasterBand(1).WriteArray(new_array)
@@ -329,7 +329,7 @@ def binarizeRaster(rasterName, rasterFolder, file, dischargeThreshold, maxSize, 
     dst_ds = None
 
 
-def tidy(Im, maxSize, plots):
+def tidy(Im, plots):
     """
 
 
@@ -337,7 +337,7 @@ def tidy(Im, maxSize, plots):
     ----------
     Im : TYPE
         DESCRIPTION.
-    maxSize : TYPE
+    
         DESCRIPTION.
 
     Returns
