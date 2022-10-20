@@ -89,7 +89,7 @@ The structure of the folders and their contents are shown and explained below in
     ├── Masks*
     └── Results*
 ```
-> ***** These folders are automatically created by the code.  
+> **\*** These folders are automatically created by the code.  
 
 - `main.py` is the file that calls all the functions and has the necessary parameters to go from Iber to the final output with the Morphologic metrics.
 - `functions.py` is the script containing all the functions that are used. Some specific parameters that were set for the braided river flume at LHE must be modified inside.
