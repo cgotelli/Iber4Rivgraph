@@ -63,7 +63,7 @@ Before running Rivgraph is necessary to export the **specific discharge** data f
   <img src="/Images/RasterExport_02.png" width="300" title="Exportation pop up.">
 </p>
 
-3. The Raster file will be created and saved inside the Iber's project folder. The total discharge (nor in x or y) is the file to be used with Rivgraph.
+3. The Raster file will be created and saved inside the Iber's project folder. The total discharge (not in x or y) is the file to be used with Rivgraph.
 <p align="center">
   <img src="/Images/RasterExport_03.png" width="800" title="Files saved in Project's folder.">
 </p>
