@@ -1,6 +1,6 @@
 # Iber for Rivgraph
 
-This is a code for using Rivgraph to analyze the results obtained with Iber. It looks forward to get the parameters explained in the work done by Tejedor et al. (2015a[^1], 2015b[^2], 2022[^3]). Below a there is an explanation on how to use the code and process the results.    
+This is a code for using Rivgraph to analyze the results obtained with Iber. It looks forward to get the parameters explained in the work done by Tejedor et al. (2015a[^1], 2015b[^2], 2022[^3]). Below there is an explanation on how to use the code and process the results.    
 
 [Iber](https://www.iberaula.es/1070/iber-model/about-the-model) is a two-dimensional numerical model for the simulation of free surface flow in rivers and estuaries. Iber solves the full depth-averaged shallow water equations in order to compute the water depth and the two horizontal components of the depth-averaged velocity.  
 
